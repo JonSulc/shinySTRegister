@@ -43,6 +43,21 @@ app_ui <- function() {
         8,
         plotOutput("overlay_image")
       )
+    ),
+    fluidRow(
+      column(4,
+        textInput(
+          "rds_filename",
+          "Filename (RDS)",
+          value = "output.rds"
+        )
+      ),
+      column(8,
+        actionButton(
+          "save_rds_button",
+          "Save"
+        )
+      )
     )
   )
 }
@@ -162,6 +177,12 @@ app_server <- function(source_spe,
         convert_spe_to_image(nbins_x = nbins, nbins_y = nbins) |>
         plot_counts()
     })
+
+    observe({
+      source_rotated() |>
+        saveRDS(input$rds_filename)
+    }) |>
+      bindEvent(input$save_rds_button)
   }
 }
 

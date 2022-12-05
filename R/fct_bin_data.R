@@ -1,5 +1,5 @@
-NBINS <- 200
-NBINS_PRECISE <- 20
+NBINS <- 300
+NBINS_PRECISE <- NBINS / 10
 
 #' @import data.table
 #' @importFrom SpatialExperiment spatialCoords
