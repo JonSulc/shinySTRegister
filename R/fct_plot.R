@@ -15,7 +15,7 @@ plot_counts <- function(counts_image,
                        points[, 1] > min(as.numeric(dimnames(counts_image)$x)) &
                        points[, 2] < max(as.numeric(dimnames(counts_image)$y)) &
                        points[, 2] > min(as.numeric(dimnames(counts_image)$y)), ]
-  print(points)
+
   if (nrow(points) != 0)
     counts_plot <- counts_plot +
       geom_point(data = points |> cbind(point = letters[1:nrow(points)]),

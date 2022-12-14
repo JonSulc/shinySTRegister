@@ -37,26 +37,26 @@ app_ui <- function() {
       column(
         4,
         DT::DTOutput("affine_matrix"),
-        actionButton("align", "Align")
+        actionButton("align", "Align"),
+        fluidRow(
+          column(4,
+                 textInput(
+                   "rds_filename",
+                   "Filename (RDS)",
+                   value = "output.rds"
+                 )
+          ),
+          column(8,
+                 actionButton(
+                   "save_rds_button",
+                   "Save"
+                 )
+          )
+        )
       ),
       column(
         8,
         plotOutput("overlay_image")
-      )
-    ),
-    fluidRow(
-      column(4,
-        textInput(
-          "rds_filename",
-          "Filename (RDS)",
-          value = "output.rds"
-        )
-      ),
-      column(8,
-        actionButton(
-          "save_rds_button",
-          "Save"
-        )
       )
     )
   )
@@ -69,7 +69,6 @@ app_server <- function(source_spe,
   function(input, output, session) {
     source_image <- reactive({
       source_spe |>
-        # bin_counts() |>
         convert_spe_to_image(nbins_x = nbins, nbins_y = nbins)
     }) |>
       bindEvent(source_spe, nbins)
