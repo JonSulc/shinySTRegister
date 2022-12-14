@@ -185,6 +185,30 @@ app_server <- function(source_spe,
   }
 }
 
+#' Launch the shiny interface to align two spatial transcriptomics samples
+#'
+#' @description
+#' This launches a shiny interface displaying a rasterized version of the
+#' samples (total counts per bin). Three points must be placed on the image of
+#' the sample to rotate, with their corresponding projections on the reference
+#' image. The coordinates of the first sample are then transformed such that the
+#' points are lined up in both. The affine matrix and the resulting
+#' superposition of the samples are displayed. When the result is satisfactory,
+#' the `SpatialExperiment` object with the transformed coordinates can be saved
+#' as an `RDS` file.
+#'
+#' @param source A [SpatialExperiment::SpatialExperiment] object containing the
+#'     sample to rotate.
+#' @param reference A [SpatialExperiment::SpatialExperiment] object containing
+#'     the reference sample.
+#' @param nbins The number of bins on each axis. This is mainly for the image
+#'     display for the definition of the points and has no impact on the final
+#'     object.
+#'
+#' @returns A [SpatialExperiment::SpatialExperiment] object containing the
+#'     rotated sample with the new coordinates.
+#'
+#' @export
 shiny_register <- function(
     source,
     reference,

@@ -30,76 +30,22 @@ add_bins <- function(spe,
   spe
 }
 
-# sum_counts_per_feature_per_bin <- function(spe) {
-#   counts <- as.data.table(t(assay(spe)))[
-#     ,
-#     `:=`(binx = colData(spe)$binx,
-#          biny = colData(spe)$biny)
-#   ][
-#     ,
-#     lapply(.SD, sum),
-#     .SDcols = -c("binx", "biny"),
-#     by = .(binx, biny)
-#   ]
-#
-#   SpatialExperiment::SpatialExperiment(
-#     assay = t(counts[, -c("binx", "biny")]),
-#     spatialCoords = as.matrix(counts[, .(binx, biny)])
-#   )
-# }
-
-# sum_features_per_spot <- function(spe) {
-#   counts <- assay(spe) |>
-#     t() |>
-#     as.data.table() |>
-#     cbind(spatialCoords(spe))
-#
-#   counts <- counts[
-#     ,
-#     .(count = rowSums(.SD)),
-#     by = .(binx, biny),
-#     .SDcols = -c("binx", "biny")
-#   ] |>
-#     t()
-#
-#   SpatialExperiment::SpatialExperiment(
-#     assay = counts,
-#     spatialCoords = spatialCoords(spe),
-#     colData = colData(spe)
-#   )
-# }
-
-
-# bin_counts <- function(spe,
-#                        nbins_x = NBINS,
-#                        nbins_y = NBINS) {
-#   add_bins(spe, nbins_x = nbins_x, nbins_y = nbins_y) |>
-#     sum_counts_per_feature_per_bin() |>
-#     sum_features_per_spot() |>
-#     add_missing_bins_to_spe(nbins_x = nbins_x, nbins_y = nbins_y)
-# }
-
-# add_missing_bins_to_spe <- function(spe,
-#                                     nbins_x = NBINS,
-#                                     nbins_y = NBINS ) {
-#   counts <- assay(spe) |>
-#     t() |>
-#     as.data.table() |>
-#     cbind(spatialCoords(spe))
-#
-#   counts <- counts[
-#     CJ(binx = seq_len(nbins_x),
-#        biny = seq_len(nbins_y)),
-#     on = .(binx, biny)
-#   ]
-#
-#   SpatialExperiment::SpatialExperiment(
-#     assay = counts[, .SD, .SDcols = -c("binx", "biny")] |> t(),
-#     spatialCoords = counts[, .(binx, biny)] |>
-#       as.matrix()
-#   )
-# }
-
+#' Convert a Spatial Experiment object to a rasterized image
+#'
+#' @description
+#' This function bins the total counts and returns a rasterized image.
+#'
+#' @param spe A [SpatialExperiment::SpatialExperiment] object containing the
+#'     data to rasterize.
+#' @param nbins_x Number of bins to use on the X axis (default is 300).
+#' @param nbins_y Number of bins to use on the Y axis (default is 300).
+#' @param nas_to_zero Whether or not to convert missing values to 0 (default is
+#'     `TRUE`).
+#'
+#' @returns An array of dimensions `nbins_x` by `nbins_y` containing the binned
+#'     counts for each "pixel".
+#'
+#' @export
 convert_spe_to_image <- function(spe,
                                  nbins_x = NBINS,
                                  nbins_y = NBINS,
@@ -107,20 +53,6 @@ convert_spe_to_image <- function(spe,
   add_bins(spe, nbins_x = nbins_x, nbins_y = nbins_y) |>
     convert_binned_spe_to_image()
 }
-
-# bin_transcript_count_per_sample <- function(
-#     spe,
-#     nbins_x = NBINS,
-#     nbins_y = NBINS
-# ) {
-#   spe <- add_bins(spe, nbins_x, nbins_y)
-#
-#   unique(colData(spe)$sample_id) |>
-#     lapply(
-#       function(sample_id)
-#         sum_counts_per_bin(spe[, colData(spe)$sample_id == sample_id])
-#     )
-# }
 
 convert_binned_spe_to_image <- function(spe,
                                  replace_nas = 0) {

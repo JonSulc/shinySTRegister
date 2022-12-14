@@ -1,16 +1,31 @@
+#' Plots the image produced by rasterizing the counts data.
+#'
+#' @param counts_image The array of binned counts, as returned by
+#'     [convert_spe_to_image].
+#' @param flip Whether or not to reverse the x and/or y axes. Should be one of
+#'     "x", "X", "y", "Y", `TRUE`, or `FALSE` (default).
+#' @param points Optional data.frame containing the coordinates of points to
+#'     plot on the image.
+#' @param log1p If `TRUE`, the counts are normalized prior to plotting. Default
+#'     is `FALSE`.
+#' @param minimal Whether to remove the axis text and legend. Default is
+#'     `FALSE`.
+#'
+#' @returns A ggplot object.
+#'
 #' @import ggplot2
+#' @export
 plot_counts <- function(counts_image,
                         flip = FALSE,
                         points = data.frame(),
                         log1p = FALSE,
-                        crop = TRUE,
                         minimal = FALSE) {
   counts_plot <- reshape2::melt(counts_image) |>
     ggplot(aes(x = x, y = y, fill = value)) +
     geom_raster() +
     viridis::scale_fill_viridis(trans = ifelse(log1p, "log1p", "identity")) +
     theme_minimal()
-  if (crop & nrow(points) != 0)
+  if (nrow(points) != 0)
     points <- points[points[, 1] < max(as.numeric(dimnames(counts_image)$x)) &
                        points[, 1] > min(as.numeric(dimnames(counts_image)$x)) &
                        points[, 2] < max(as.numeric(dimnames(counts_image)$y)) &
@@ -24,11 +39,13 @@ plot_counts <- function(counts_image,
   if (minimal)
     counts_plot <- counts_plot +
       theme(axis.text = element_blank(), legend.position = "none")
-  if (!flip)
-    return(counts_plot)
-  counts_plot +
-    scale_x_reverse() +
-    scale_y_reverse()
+
+  if (flip %in% c("x", "X") || isTRUE(flip))
+    counts_plot <- counts_plot + scale_x_reverse()
+  if (flip %in% c("y", "Y") || isTRUE(flip))
+    counts_plot <- counts_plot + scale_y_reverse()
+
+  counts_plot
 }
 
 ensure_interval_within_image <- function(center_position, size, image_dim) {
